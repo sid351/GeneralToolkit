@@ -4,6 +4,49 @@
 
 #>
 
+Function Confirm-RunningElevated
+{
+[cmdletbinding()]
+[OutputType([bool])]
+Param()
+    If(([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+    {
+        Write-Output $true
+    }
+    else
+    {
+        Write-Output $false
+    }
+}
+
+Function New-ModuleParentFolder
+{
+[cmdletbinding()]
+Param($path)
+
+    If(-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+    {
+        Write-Warning -Message "You do not have Administrator rights.`nPlease re-run this script as an Administrator!"
+        Break
+    }
+
+    #Adds $path to the PSModulePath environment variable
+
+    $currentPathList = [Environment]::GetEnvironmentVariable("PSModulePath")
+    
+    If($currentPathList.Split(";").Trim().ToLower() -contains $path.Trim().ToLower())
+    {
+        Write-Output "$path already exists in PSModulePath"
+    }
+    Else
+    {
+        $currentPathList += ";$path"
+        [Environment]::SetEnvironmentVariable("PSModulePath",$currentPathList, "Machine")
+        Write-Output "$path has been added to PSModulePath. Restart PowerShell to complete the addition."
+    }
+
+}
+
 Function Confirm-ModuleAvailable
 {
 [cmdletbinding()]
