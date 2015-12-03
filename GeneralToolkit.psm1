@@ -19,10 +19,12 @@ Param()
     }
 }
 
-Function New-ModuleParentFolder
+Function Add-ModuleParentFolder
 {
 [cmdletbinding()]
-Param($path)
+Param(
+    $path = (Get-Location | Select-Object -ExpandProperty Path)
+)
 
     If(-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
     {
@@ -46,6 +48,16 @@ Param($path)
     }
 
 }
+<#
+.SYNOPSIS
+    Adds -Path to the PSModulePath environment variable, so modules underneath this parent directory can be loaded in future.
+
+    Path defaults to the current path if not defined.
+
+    Requires admin rights as it is making a change to the registry in the backend.
+
+    PowerShell must be restarted to access the updated environment variable.
+#>
 
 Function Confirm-ModuleAvailable
 {
