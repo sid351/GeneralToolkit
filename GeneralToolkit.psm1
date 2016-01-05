@@ -106,6 +106,7 @@ Param( [string][alias("ModuleName")]$name )
         If((Get-Module -ListAvailable | Where-Object -FilterScript {$_.Name -eq $name}) -ne $null)
         {
             Import-Module -Name $name -Global
+            Write-Verbose -Message "Module $Name has been loaded."
             Write-Output "Module $Name has been loaded."
         }
         else
@@ -115,6 +116,7 @@ Param( [string][alias("ModuleName")]$name )
     }
     else
     {
+        Write-Verbose -Message "$name is already loaded"
         Write-Output "$name is already loaded"
     }
 }
