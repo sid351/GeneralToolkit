@@ -197,3 +197,95 @@ param(
     
 #>
 }
+
+Function Confirm-FilesExist
+{
+[cmdletbinding()]
+Param(
+    [parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)][string]$sourceFolder,
+        #Full Path to the Source Folder
+    [string]$fileExtensionFilter = "*",
+        #The filter string to use for the file extension
+    [int]$numDaysSinceLastWriteTime = 0,
+        #The number of days since the last write time (inclusive) to keep files for
+    [int]$numMinFilesToKeep = 1,
+        #The minimum number of files that should remain in the folder after older items are deleted
+    [int64]$minSizeInBytes = 0,
+        #The minimum file size in bytes.  Use the KB, MB and GB operators to determine exact values for larger sizes.
+    [switch]$recurse,
+        #Recurse through the sub-directories
+    [switch]$force
+        #Force the action
+    )
+
+
+    [scriptBlock]$fileFilter = {$_.Length -ge $minSizeInBytes}
+
+    If($numDaysSinceLastWriteTime -gt 0)
+    {
+        $fileFilter = {$fileFilter.ToString() -and $_.LastWriteTime -ge (Get-Date).AddDays(-$numDaysSinceLastWriteTime)}
+    }
+
+    [bool]$filesExist = [bool]((Get-ChildItem -File -Path $sourceFolder -Filter $fileExtensionFilter -Recurse:$recurse -Force:$force |
+                          Where-Object -FilterScript $fileFilter |
+                           Measure-Object |
+                            Where-Object -FilterScript {$_.Count -ge $numMinFilesToKeep}
+                               ) -ne $null)
+    
+    $output = New-Object -TypeName PSCustomObject -Property @{
+        filesExist = $true
+        sourceFolder = $sourceFolder
+        fileExtensionFilter = $fileExtensionFilter
+        numDaysSinceLastWriteTime = $numDaysSinceLastWriteTime
+        recurse = $recurse
+        force = $force
+    }
+
+    Write-Output $output
+}
+<#
+.NOTES 
+    Requires v3+ because of how Get-ChildItem is called
+
+.DESCRIPTION
+    Returns a custom object. Use the "filesExist" output for boolean logic.  The other parameters are provided for piping to other cmdlets and functions.
+    
+    Checks that there are at least (more than or equal to) -numMinFilesToKeep files 
+     matching the -fileExtensionFilter 
+      that are at least -minSizeInBytes bytes
+       and have been last written to since -numDaysSinceLastWriteTime days ago (inclusive).
+#>
+
+Function Remove-ObsoleteFiles
+{
+[cmdletbinding()]
+Param(
+    [parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelinebyPropertyName=$True)][string]$sourceFolder,
+        #Full Path to the Source Folder
+    [parameter(ValueFromPipelinebyPropertyName=$True)][string]$fileExtensionFilter = "*",
+        #The filter string to use for the file extension
+    [parameter(ValueFromPipelinebyPropertyName=$True)][int]$numDaysSinceLastWriteTime = 0,
+        #The number of days since the last write time (inclusive) to keep files for
+    [parameter(ValueFromPipelinebyPropertyName=$True)][switch]$recurse,
+        #Recurse through the sub-directories
+    [parameter(ValueFromPipelinebyPropertyName=$True)][switch]$force,
+        #Force the action
+    [parameter(ValueFromPipelinebyPropertyName=$True)][switch]$whatIf
+        #Simulate the action
+    )
+
+        Get-ChildItem -File -Path $sourceFolder -Filter "$fileExtensionFilter" -Recurse:$recurse -Force:$force |
+         Where-Object -FilterScript {$_.LastWriteTime -lt (Get-Date).AddDays(-$numDaysSinceLastWriteTime)} |
+          Remove-Item -Force:$force -WhatIf:$whatIf
+}
+<#
+.NOTES 
+    Requires v3+ because of how Get-ChildItem is called
+
+.DESCRIPTION
+    Does not return any objects.
+
+    Will remove items from the -sourceFolder
+     that match the optional -fileExtensionFilter
+      and have not been written to since -numDaysSinceLastWriteTime ago
+#>
