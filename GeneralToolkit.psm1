@@ -223,7 +223,7 @@ Param(
 
     If($numDaysSinceLastWriteTime -gt 0)
     {
-        $fileFilter = {$fileFilter.ToString() -and $_.LastWriteTime -ge (Get-Date).AddDays(-$numDaysSinceLastWriteTime)}
+        $fileFilter = {$_.Length -ge $minSizeInBytes -and $_.LastWriteTime -ge (Get-Date).AddDays(-$numDaysSinceLastWriteTime)}
     }
 
     [bool]$filesExist = [bool]((Get-ChildItem -File -Path $sourceFolder -Filter $fileExtensionFilter -Recurse:$recurse -Force:$force |
@@ -233,7 +233,7 @@ Param(
                                ) -ne $null)
     
     $output = New-Object -TypeName PSCustomObject -Property @{
-        filesExist = $true
+        filesExist = $filesExist
         sourceFolder = $sourceFolder
         fileExtensionFilter = $fileExtensionFilter
         numDaysSinceLastWriteTime = $numDaysSinceLastWriteTime
