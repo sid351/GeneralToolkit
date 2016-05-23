@@ -131,8 +131,17 @@ Param(
 
     If(-not (Test-Path -Path $path))
     {
-        New-Item -Path $path -ItemType $itemType
+        try
+        {
+            New-Item -Path $path -ItemType $itemType -ErrorAction Stop
+            Write-Output "Path ($($path)) has been created"
+        }
+        catch
+        {
+            Write-Error -Message "There was a problem creating the path ($($path)): $_"
+        }
     }    
+    Write-Output "Path ($($path)) already exists"
 }
 
 
