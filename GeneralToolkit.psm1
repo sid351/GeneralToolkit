@@ -298,3 +298,101 @@ Param(
      that match the optional -fileExtensionFilter
       and have not been written to since -numDaysSinceLastWriteTime ago
 #>
+
+Function ConvertTo-PhoneticAlphabet
+{
+Param(
+    [string]$Text
+)
+
+    $output = foreach($character in $Text.ToCharArray())
+    {
+        $phonetic = switch($character)
+        {
+            "a" { Write-Output "alpha" }
+            "b" { Write-Output "bravo" }
+            "c" { Write-Output "charlie" }
+            "d" { Write-Output "delta" }
+            "e" { Write-Output "echo" }
+            "f" { Write-Output "foxtrot" }
+            "g" { Write-Output "golf" }
+            "h" { Write-Output "hotel" }
+            "i" { Write-Output "india" }
+            "j" { Write-Output "juliet" }
+            "k" { Write-Output "kilo" }
+            "l" { Write-Output "lima" }
+            "m" { Write-Output "mike" }
+            "n" { Write-Output "november" }
+            "o" { Write-Output "oscar" }
+            "p" { Write-Output "papa" }
+            "q" { Write-Output "quebec" }
+            "r" { Write-Output "romeo" }
+            "s" { Write-Output "sierra" }
+            "t" { Write-Output "tango" }
+            "u" { Write-Output "uniform" }
+            "v" { Write-Output "victor" }
+            "w" { Write-Output "whiskey" }
+            "x" { Write-Output "xray" }
+            "y" { Write-Output "yankee" }
+            "z" { Write-Output "zulu" }
+            "0" { Write-Output "ZERO" }
+            "1" { Write-Output "ONE" }
+            "2" { Write-Output "TWO" }
+            "3" { Write-Output "THREE" }
+            "4" { Write-Output "FOUR" }
+            "5" { Write-Output "FIVE" }
+            "6" { Write-Output "SIX" }
+            "7" { Write-Output "SEVEN" }
+            "8" { Write-Output "EIGTH" }
+            "9" { Write-Output "NINE" }
+            "-" { Write-Output "DASH" }
+            "." { Write-Output "POINT" }
+            #Not strictly phonetic, but useful for password communications
+            " " { Write-Output "SPACE" }
+            "$" { Write-Output "DOLLAR" }
+            "£" { Write-Output "POUND" }
+            "#" { Write-Output "HASH" }
+            "|" { Write-Output "PIPE" }
+            "@" { Write-Output "AT" }
+            "!" { Write-Output "EXCLAMATION" }
+            "{" { Write-Output "OPENBRACE" }
+            "}" { Write-Output "CLOSEBRACE" }
+            "[" { Write-Output "OPENSQUARE" }
+            "]" { Write-Output "CLOSESQUARE" }
+            "(" { Write-Output "OPENBRACKET" }
+            ")" { Write-Output "CLOSEBRACKET" }
+            "~" { Write-Output "TILDE" }
+            "?" { Write-Output "QUESTIONMARK" }
+            "/" { Write-Output "FORWARDSLASH" }
+            "\" { Write-Output "BACKSLASH" }
+            "%" { Write-Output "PERCENT" }
+            "&" { Write-Output "AMPERSAND" }
+            "*" { Write-Output "ASTERISK" }
+            "_" { Write-Output "UNDERSCORE" }
+            "=" { Write-Output "EQUALS" }
+            "+" { Write-Output "ADDITION" }
+            "," { Write-Output "COMMA" }
+            ":" { Write-Output "COLON" }
+            ";" { Write-Output "SEMICOLON" }
+            "'" { Write-Output "SINGLEQUOTE" }
+            "`"" { Write-Output "DOUBLEQUOTE" }
+            "^" { Write-Output "CARET" }
+            default {Write-Output $character}
+        }
+
+        If([Char]::IsUpper([Char]$Character) -and $phonetic -isnot [char])
+        {
+            $phonetic = $phonetic.ToUpper()
+        }
+
+        Write-Output $phonetic
+    }
+
+    Write-Output ($output -join " ")
+}
+<#
+.DESCRIPTION
+    Returns a space delimited string with the phonetic value for recognised characters in the appropriate case.
+
+    Useful for keeping a note of complex passwords when sharing with colleagues.
+#>
