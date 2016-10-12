@@ -46,13 +46,13 @@ Param(
         # Exit from the current, unelevated, process
         exit   
     }
-}
 <#
 
 .LINK
     http://blogs.msdn.com/b/virtual_pc_guy/archive/2010/09/23/a-self-elevating-powershell-script.aspx
 
 #>
+}
 
 Function Add-ModuleParentFolder
 {
@@ -81,8 +81,6 @@ Param(
         [Environment]::SetEnvironmentVariable("PSModulePath",$currentPathList, "Machine")
         Write-Output "$path has been added to PSModulePath. Restart PowerShell to complete the addition."
     }
-
-}
 <#
 .SYNOPSIS
     Adds -Path to the PSModulePath environment variable, so modules underneath this parent directory can be loaded in future.
@@ -93,6 +91,7 @@ Param(
 
     PowerShell must be restarted to access the updated environment variable.
 #>
+}
 
 Function Confirm-ModuleAvailable
 {
@@ -251,7 +250,7 @@ Param(
     }
 
     Write-Output $output
-}
+
 <#
 .NOTES 
     Requires v3+ because of how Get-ChildItem is called
@@ -264,6 +263,7 @@ Param(
       that are at least -minSizeInBytes bytes
        and have been last written to since -numDaysSinceLastWriteTime days ago (inclusive).
 #>
+}
 
 Function Remove-ObsoleteFiles
 {
@@ -286,7 +286,6 @@ Param(
         Get-ChildItem -File -Path $sourceFolder -Filter "$fileExtensionFilter" -Recurse:$recurse -Force:$force |
          Where-Object -FilterScript {$_.LastWriteTime -lt (Get-Date).AddDays(-$numDaysSinceLastWriteTime)} |
           Remove-Item -Force:$force -WhatIf:$whatIf
-}
 <#
 .NOTES 
     Requires v3+ because of how Get-ChildItem is called
@@ -298,6 +297,8 @@ Param(
      that match the optional -fileExtensionFilter
       and have not been written to since -numDaysSinceLastWriteTime ago
 #>
+}
+
 
 Function ConvertTo-PhoneticAlphabet
 {
@@ -389,10 +390,11 @@ Param(
     }
 
     Write-Output ($output -join " ")
-}
+
 <#
 .DESCRIPTION
     Returns a space delimited string with the phonetic value for recognised characters in the appropriate case.
 
     Useful for keeping a note of complex passwords when sharing with colleagues.
 #>
+}
